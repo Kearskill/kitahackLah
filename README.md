@@ -15,3 +15,34 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+```
+lib/
+│
+├── main.dart
+│
+├── app/
+│   ├── app.dart
+│   ├── theme/
+│   │   ├── app_theme.dart
+│   │   └── color_schemes.dart
+│   └── routes.dart
+│
+├── core/
+│   ├── constants/
+│   ├── utils/
+│   └── services/
+│
+├── features/
+│   └── home/
+│       ├── home_page.dart
+│       ├── home_view.dart
+│       └── widgets/
+│
+├── shared/
+│   ├── widgets/
+│   └── extensions/
+│
+└── models/
+```
