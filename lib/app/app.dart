@@ -1,4 +1,3 @@
-import 'package:kitahack_app/app/app.dart';
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import '../features/home/home_page.dart';
