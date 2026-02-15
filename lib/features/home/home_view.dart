@@ -43,13 +43,13 @@ class HomeView extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Utama'),
-          NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Imbasan'),
-          NavigationDestination(icon: Icon(Icons.description), label: 'Laporan'),
-        ],
-      ),
+    //   bottomNavigationBar: NavigationBar(
+    //     destinations: const [
+    //       NavigationDestination(icon: Icon(Icons.home), label: 'Utama'),
+    //       NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Imbasan'),
+    //       NavigationDestination(icon: Icon(Icons.description), label: 'Laporan'),
+    //     ],
+    //   ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {}, // This would trigger your AI/Gemini assistant
         child: const Icon(Icons.add),
