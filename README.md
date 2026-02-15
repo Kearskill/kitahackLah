@@ -58,3 +58,12 @@ lib/
 ![Google Workspace](https://img.shields.io/badge/Google%20Workspace-4285F4?style=for-the-badge&logo=googleworkspace&logoColor=white)
 ![Google Meet Integration](https://img.shields.io/badge/Google%20Meet-00897B?style=for-the-badge&logo=googlemeet&logoColor=white)
 
+
+
+flutter dependencies
+
+```
+flutter pub get
+
+dart run flutter_native_splash:create
+```
