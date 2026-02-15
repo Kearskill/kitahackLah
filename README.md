@@ -52,3 +52,9 @@ lib/
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Cloud Vision API](https://img.shields.io/badge/Cloud%20Vision%20API-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
+![Gemini API](https://img.shields.io/badge/Gemini%20API-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
+![Speech-to-Text API](https://img.shields.io/badge/Speech--to--Text%20API-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
+![Google Workspace](https://img.shields.io/badge/Google%20Workspace-4285F4?style=for-the-badge&logo=googleworkspace&logoColor=white)
+![Google Meet Integration](https://img.shields.io/badge/Google%20Meet-00897B?style=for-the-badge&logo=googlemeet&logoColor=white)
+
