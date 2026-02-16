@@ -15,13 +15,17 @@ class HomeView extends StatelessWidget {
             children: [
               _buildHeader(),
               const SizedBox(height: 24),
-              _buildMainActionCard(),
+              _buildMainActionCard(context),
               const SizedBox(height: 16),
               _buildSecondaryActions(),
               const SizedBox(height: 24),
               const Text(
                 "Statistik Hari Ini",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
               ),
               const SizedBox(height: 16),
               _buildStatisticsGrid(),
@@ -39,9 +43,21 @@ class HomeView extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Isnin, 16 Februari 2026", style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const Text("Selamat datang, Siti!", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            Text("Klinik Kesihatan Bario", style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w500)),
+            const Text(
+              "Isnin, 16 Februari 2026",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+            const Text(
+              "Selamat datang, Siti!",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "Klinik Kesihatan Bario",
+              style: TextStyle(
+                color: Colors.blue.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
         Container(
@@ -55,47 +71,123 @@ class HomeView extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Icon(Icons.person, color: Colors.white), // Optional: Add an icon inside
+          child: const Icon(
+            Icons.person,
+            color: Colors.white,
+          ), // Optional: Add an icon inside
         ),
       ],
     );
   }
 
-  Widget _buildMainActionCard() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF2962FF), Color(0xFF00BFA5)]),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.blue.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 5))],
-      ),
-      child: const Row(
-        children: [
-          CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.add, color: Colors.white)),
-          SizedBox(width: 16),
-          Text("Kes Baru", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-          Spacer(),
-          Icon(Icons.arrow_forward, color: Colors.white),
-        ],
+  Widget _buildMainActionCard(BuildContext context) {
+    // Pass context here
+    return InkWell(
+      // 1. Wrap with InkWell for tapping
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/triage',
+        ); // 2. Navigate to your triage flow
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF2962FF), Color(0xFF00BFA5)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: const Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white24,
+              child: Icon(Icons.add, color: Colors.white),
+            ),
+            SizedBox(width: 16),
+            Text(
+              "Kes Baru",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Spacer(),
+            Icon(Icons.arrow_forward, color: Colors.white),
+          ],
+        ),
       ),
     );
   }
+
+  // Widget _buildMainActionCard(BuildContext context) {
+  //   return Inkwell(
+  //     onTap: () {
+  //       Navigator.pushNamed(context, '/triage');
+  //     },
+  //   borderRadius: BorderRadius.circular(20),
+
+  //   child: Container(
+  //     padding: const EdgeInsets.all(24),
+  //     decoration: BoxDecoration(
+  //       gradient: const LinearGradient(colors: [Color(0xFF2962FF), Color(0xFF00BFA5)]),
+  //       borderRadius: BorderRadius.circular(20),
+  //       boxShadow: [BoxShadow(color: Colors.blue.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 5))],
+  //     ),
+  //     child: const Row(
+  //       children: [
+  //         CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.add, color: Colors.white)),
+  //         SizedBox(width: 16),
+  //         Text("Kes Baru", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+  //         Spacer(),
+  //         Icon(Icons.arrow_forward, color: Colors.white),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildSecondaryActions() {
     return Row(
       children: [
-        _buildSmallAction("Sejarah Kes", Icons.history, Colors.blue.shade50, Colors.blue),
+        _buildSmallAction(
+          "Sejarah Kes",
+          Icons.history,
+          Colors.blue.shade50,
+          Colors.blue,
+        ),
         const SizedBox(width: 16),
-        _buildSmallAction("Panduan Rawatan", Icons.menu_book, Colors.teal.shade50, Colors.teal),
+        _buildSmallAction(
+          "Panduan Rawatan",
+          Icons.menu_book,
+          Colors.teal.shade50,
+          Colors.teal,
+        ),
       ],
     );
   }
 
-  Widget _buildSmallAction(String title, IconData icon, Color bg, Color iconCol) {
+  Widget _buildSmallAction(
+    String title,
+    IconData icon,
+    Color bg,
+    Color iconCol,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
             Icon(icon, color: iconCol, size: 30),
@@ -110,26 +202,51 @@ class HomeView extends StatelessWidget {
   Widget _buildStatisticsGrid() {
     return Row(
       children: [
-        _buildStatCard("3", "kes hari ini", Icons.description_outlined, Colors.black),
+        _buildStatCard(
+          "3",
+          "kes hari ini",
+          Icons.description_outlined,
+          Colors.black,
+        ),
         const SizedBox(width: 12),
         _buildStatCard("2", "perlu susulan", Icons.access_time, Colors.orange),
         const SizedBox(width: 12),
-        _buildStatCard("12", "rujukan bulan ini", Icons.trending_up, Colors.green),
+        _buildStatCard(
+          "12",
+          "rujukan bulan ini",
+          Icons.trending_up,
+          Colors.green,
+        ),
       ],
     );
   }
 
-  Widget _buildStatCard(String val, String label, IconData icon, Color iconCol) {
+  Widget _buildStatCard(
+    String val,
+    String label,
+    IconData icon,
+    Color iconCol,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
             Icon(icon, color: iconCol),
             const SizedBox(height: 8),
-            Text(val, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+            Text(
+              val,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 10, color: Colors.grey),
+            ),
           ],
         ),
       ),
