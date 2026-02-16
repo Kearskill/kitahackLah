@@ -67,3 +67,14 @@ flutter pub get
 
 dart run flutter_native_splash:create
 ```
+
+
+
+summary of the project, including its purpose and problem statement.
+How it aligns with AI and SDGs.
+
+
+ setup instructions
+
+ Technical Implementation Overview of technologies used, including Google tools.
+Explanation of implementation, innovation, and challenges faced.
