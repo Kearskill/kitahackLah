@@ -78,3 +78,7 @@ How it aligns with AI and SDGs.
 
  Technical Implementation Overview of technologies used, including Google tools.
 Explanation of implementation, innovation, and challenges faced.
+
+
+npm install -g firebase-tools
+
