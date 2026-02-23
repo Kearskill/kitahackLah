@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "486655634814",
+    "project_id": "doctelemy",
+    "storage_bucket": "doctelemy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486655634814:android:8840191d098bd7addfd72f",
+        "android_client_info": {
+          "package_name": "com.example.kitahack_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJtXxVNNa_51rfHW6yx-zdnqbROewjgwQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
