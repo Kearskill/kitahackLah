@@ -24,8 +24,18 @@ class BloodPressureFormatter extends TextInputFormatter {
 }
 
 
-class VitalsStep extends StatelessWidget {
+class VitalsStep extends StatefulWidget {
   const VitalsStep({super.key});
+  
+  @override
+  State<VitalsStep> createState() => _VitalsStepState();
+}
+
+class _VitalsStepState extends State<VitalsStep> {
+
+  String gulaDarahType = "";
+  String dengueResult = "";
+  String malariaResult = "";
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +116,7 @@ class VitalsStep extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 title: Text(
-                  "Sejarah Perubatan",
+                  "Ujian Darah (Pilihan)",
                   style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 children: [
@@ -117,20 +127,95 @@ class VitalsStep extends StatelessWidget {
                       children: [
                         
                         const Text(
-                          "Alahan Ubat",
+                          "Gula Darah",
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("Contoh: Penincillin, Aspirin", ""),
+                        _buildRoundedTextField("5.5", "mmol/L"),
+                        const SizedBox(height: 10),
+
+                        Row(
+                          children: [
+                            _selectionButton(
+                              currentValue: gulaDarahType,
+                              buttonValue: "Puasa",
+                              onSelected: (val) => gulaDarahType = val,
+                            ),
+                            const SizedBox(width: 12),
+                            _selectionButton(
+                              currentValue: gulaDarahType,
+                              buttonValue: "Rawak",
+                              onSelected: (val) => gulaDarahType = val,
+                            ),
+                          ],
+                        ),
+
                         const SizedBox(height: 20),
 
                         const Text(
-                          "Ubat Semasa",
+                          "Hemoglobin",
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("Senarai ubat diambil", ""),
+                        _buildRoundedTextField("13.5", "g/dL"),
                         const SizedBox(height: 20),
+
+                        const Text(
+                          "Ujian Pantas Dengue",
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _selectionButton(
+                              currentValue: dengueResult,
+                              buttonValue: "Positif",
+                              onSelected: (val) => dengueResult = val,
+                            ),
+                            _selectionButton(
+                              currentValue: dengueResult,
+                              buttonValue: "Negatif",
+                              onSelected: (val) => dengueResult = val,
+                            ),
+                            _selectionButton(
+                              currentValue: dengueResult,
+                              buttonValue: "Tidak Dibuat",
+                              onSelected: (val) => dengueResult = val,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        const Text(
+                          "Ujian Pantas Malaria",
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _selectionButton(
+                              currentValue: malariaResult,
+                              buttonValue: "Positif",
+                              onSelected: (val) => malariaResult = val,
+                            ),
+                            _selectionButton(
+                              currentValue: malariaResult,
+                              buttonValue: "Negatif",
+                              onSelected: (val) => malariaResult = val,
+                            ),
+                            _selectionButton(
+                              currentValue: malariaResult,
+                              buttonValue: "Tidak Dibuat",
+                              onSelected: (val) => malariaResult = val,
+                            ),
+                          ],
+                        ),
                       ],
                     ), 
                   ),
@@ -212,14 +297,14 @@ Widget _buildVitalItem(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-    // enabledBorder: OutlineInputBorder( 
-    //   borderRadius: BorderRadius.circular(20),
-    //   borderSide: BorderSide(color: Colors.grey.shade400),
-    // ),
-    // focusedBorder: OutlineInputBorder(
-    //   borderRadius: BorderRadius.circular(20),
-    //   borderSide: const BorderSide(color: Colors.blue),
-    // ),
+    enabledBorder: OutlineInputBorder( 
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(color: Colors.grey.shade400),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: const BorderSide(color: Colors.blue),
+    ),
       ),
     );
   }
@@ -297,6 +382,56 @@ Widget _buildVitalItem(
             ),
           ),
         ],
+      ),
+    );
+  }
+
+Widget _selectionButton({
+  required String currentValue,
+  required String buttonValue,
+  required Function(String) onSelected,
+  }) {
+    bool isSelected = currentValue == buttonValue;
+
+    Color activeColor;
+
+    switch (buttonValue) {
+      case "Positif":
+        activeColor = Colors.red;
+        break;
+      case "Negatif":
+        activeColor = Colors.green;
+        break;
+      case "Tidak Dibuat":
+        activeColor = Colors.grey;
+        break;
+      default:
+        activeColor = Colors.blue;
+    }
+
+    return OutlinedButton(
+      onPressed: () => setState(() => onSelected(buttonValue)),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        backgroundColor:
+            isSelected ? activeColor.withOpacity(0.1) : Colors.white,
+        side: BorderSide(
+          color: isSelected ? activeColor : Colors.grey.shade300,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: Text(
+        buttonValue,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: isSelected ? activeColor : Colors.black87,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

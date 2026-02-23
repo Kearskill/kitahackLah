@@ -49,7 +49,7 @@ class _AnalysisViewState extends State<AnalysisView> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const TriageResultView(category: "SEDERHANA"),
+        builder: (context) => const TriageResultView(category: "SEDERAHANA"),
       ),
     );
   }

@@ -247,14 +247,14 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-    // enabledBorder: OutlineInputBorder( 
-    //   borderRadius: BorderRadius.circular(20),
-    //   borderSide: BorderSide(color: Colors.grey.shade400),
-    // ),
-    // focusedBorder: OutlineInputBorder(
-    //   borderRadius: BorderRadius.circular(20),
-    //   borderSide: const BorderSide(color: Colors.blue),
-    // ),
+        enabledBorder: OutlineInputBorder( 
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.blue),
+        ),
       ),
     );
   }

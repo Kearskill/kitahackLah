@@ -83,7 +83,7 @@ class TriageResultView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: category == "TERUK" ? Colors.red : Colors.green,
+        color: category == "TERUK" ? Colors.red : category == "SEDERHANA" ? Colors.yellow : Colors.green,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -96,4 +96,6 @@ class TriageResultView extends StatelessWidget {
       ),
     );
   }
+
+  
 }

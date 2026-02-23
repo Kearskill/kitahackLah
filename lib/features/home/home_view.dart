@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kitahack_app/features/triage/case_history_page.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -17,7 +18,7 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 24),
               _buildMainActionCard(context),
               const SizedBox(height: 16),
-              _buildSecondaryActions(),
+              _buildSecondaryActions(context),
               const SizedBox(height: 24),
               const Text(
                 "Statistik Hari Ini",
@@ -155,7 +156,7 @@ class HomeView extends StatelessWidget {
   //   );
   // }
 
-  Widget _buildSecondaryActions() {
+  Widget _buildSecondaryActions(BuildContext context) {
     return Row(
       children: [
         _buildSmallAction(
@@ -163,6 +164,14 @@ class HomeView extends StatelessWidget {
           Icons.history,
           Colors.blue.shade50,
           Colors.blue,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CaseHistoryPage(),
+              ),
+            );
+          },
         ),
         const SizedBox(width: 16),
         _buildSmallAction(
@@ -170,6 +179,9 @@ class HomeView extends StatelessWidget {
           Icons.menu_book,
           Colors.teal.shade50,
           Colors.teal,
+          onTap: () {
+            // leave empty for now
+          },
         ),
       ],
     );
@@ -179,21 +191,29 @@ class HomeView extends StatelessWidget {
     String title,
     IconData icon,
     Color bg,
-    Color iconCol,
-  ) {
+    Color iconCol, {
+    VoidCallback? onTap,
+  }) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: iconCol, size: 30),
-            const SizedBox(height: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: iconCol, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ),
     );
