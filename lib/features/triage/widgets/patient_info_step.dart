@@ -1,15 +1,55 @@
 // Step 1: Maklumakt Pesakit
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kitahack_app/features/triage/triage_page.dart';
 
+
+class DateInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digits.length > 8) {
+      digits = digits.substring(0, 8);
+    }
+
+    String formatted = '';
+
+    if (digits.length >= 1) {
+      formatted += digits.substring(0, digits.length >= 2 ? 2 : digits.length);
+    }
+
+    if (digits.length > 2) {
+      formatted += '-';
+      formatted += digits.substring(2, digits.length >= 4 ? 4 : digits.length);
+    }
+
+    if (digits.length > 4) {
+      formatted += '-';
+      formatted += digits.substring(4);
+    }
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
 class PatientInfoStep extends StatefulWidget {
-  const PatientInfoStep({super.key});
+  final CaseDraft draft;
+  const PatientInfoStep({
+    super.key,
+    required this.draft,
+  });
 
   @override
   State<PatientInfoStep> createState() => _PatientInfoStepState();
 }
 
 class _PatientInfoStepState extends State<PatientInfoStep> {
-  String gender = 'Lelaki';
 
   final List<String> penyakitKronikList = [
     "Tiada",
@@ -20,8 +60,6 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
     "Buah Pinggang",
     "Lain-lain",
   ];
-
-  List<String> selectedPenyakitKronik = [];
   final TextEditingController otherController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   bool isFollowUp = false;
@@ -40,7 +78,12 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          _buildRoundedTextField("Nama penuh pesakit", ""),
+          _buildRoundedTextField(
+            hint: "Nama penuh pesakit",
+            onChanged: (value) {
+              widget.draft.name = value;
+            },
+          ),
           const SizedBox(height: 20),
           
           
@@ -49,15 +92,16 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
             style: TextStyle(fontWeight: FontWeight.bold)
           ),
           const SizedBox(height: 8),
-          const TextField(
-            decoration: InputDecoration(
-              hintText: "0",
-
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-            ),
+          _buildRoundedTextField(
+            hint: "Umur",
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            onChanged: (value) {
+              widget.draft.age = int.tryParse(value) ?? 0;
+            },
           ),
           const SizedBox(height: 20),
           
@@ -72,6 +116,7 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
             ],
           ),
           const SizedBox(height: 20),
+
 
           Container(
             decoration: BoxDecoration(
@@ -108,9 +153,15 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                         const SizedBox(height: 8),
 
                         _buildPenyakitGrid(),
-                        if (selectedPenyakitKronik.contains("Lain-lain")) ...[
+                        if (widget.draft.penyakitKronik.contains("Lain-lain")) ...[
                           const SizedBox(height: 16),
-                          _buildRoundedTextField("Nyatakan penyakit kronik lain", ""),
+                          _buildRoundedTextField(
+                            hint: "Nyatakan penyakit kronik lain",
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              widget.draft.penyakitKronikLain = value;
+                            },
+                          ),
                         ],
                         const SizedBox(height: 20),
                         
@@ -120,7 +171,12 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("Contoh: Penincillin, Aspirin", ""),
+                        _buildRoundedTextField(
+                          hint: "Contoh: Penincillin, Aspirin",
+                          onChanged: (value){
+                            widget.draft.drugAllergy = value;
+                          }
+                        ),
                         const SizedBox(height: 20),
 
                         const Text(
@@ -128,7 +184,12 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("Senarai ubat diambil", ""),
+                        _buildRoundedTextField(
+                          hint : "Senarai ubat diambil", 
+                          onChanged: (value){
+                            widget.draft.currentMeedication = value;
+                          }
+                        ),
                         const SizedBox(height: 20),
                       ],
                     ), 
@@ -176,6 +237,23 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                         TextField(
                           controller: dateController,
                           keyboardType: TextInputType.datetime,
+                          inputFormatters: [DateInputFormatter()],
+                            onChanged: (value) {
+                              final parts = value.split("-");
+                              if (parts.length == 3) {
+                                try {
+                                  widget.draft.lastClinicVisit = DateTime(
+                                    int.parse(parts[2]),
+                                    int.parse(parts[1]),
+                                    int.parse(parts[0]),
+                                  );
+                                } catch (_) {
+                                  widget.draft.lastClinicVisit = null;
+                                }
+                              } else {
+                                widget.draft.lastClinicVisit = null;
+                              }
+                            },
                           decoration: InputDecoration(
                             hintText: "DD-MM-YYYY",
                             contentPadding: const EdgeInsets.symmetric(
@@ -185,31 +263,35 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.calendar_today),
                               onPressed: () => _selectDate(context),
                             ),
+                            enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide(color: Colors.grey.shade400),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                                  borderSide: BorderSide(color: Colors.blue),
+                                ),
                           ),
                         ),
                         const SizedBox(height: 20),
                         
                         
                         const Text(
-                          "Sebab Lawatan Lepas",
+                          "Sebab Lawatan Lepas (Pilihan)",
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("Contoh: Sakit kepala, Demam", ""),
+                        _buildRoundedTextField(
+                          hint: "Contoh: Sakit kepala, Demam",
+                          onChanged: (value){
+                            widget.draft.pastVisitReason = value;
+                          } 
+                        ),
                         const SizedBox(height: 20),
-
-                        const Text(
-                          "Ubat Semasa",
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildRoundedTextField("Senarai ubat diambil", ""),
-                        const SizedBox(height: 10),
 
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
@@ -217,10 +299,10 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                             "Kes Susulan?",
                             style: TextStyle(fontWeight: FontWeight.w500),
                           ),
-                          value: isFollowUp,
+                          value: widget.draft.isFollowUp,
                           onChanged: (value) {
                             setState(() {
-                              isFollowUp = value;
+                              widget.draft.isFollowUp = value;
                             });
                           },
                         )
@@ -236,59 +318,69 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
     );
   }
 
-  Widget _buildRoundedTextField(
-      String hint, 
-      String suffix, 
-    ){
+  Widget _buildRoundedTextField({
+    required String hint,
+    String suffix = "",
+    TextInputType keyboardType = TextInputType.text,
+    Function(String)? onChanged,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
     return TextField(
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         hintText: hint,
         suffixText: suffix,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        enabledBorder: OutlineInputBorder( 
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Colors.grey.shade400),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Colors.blue),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderSide: BorderSide(color: Colors.blue),
         ),
       ),
     );
   }
-  Widget _genderButton(String val, IconData icon) {
-    bool isSelected = gender == val;
-    return Expanded(
-      child: OutlinedButton.icon(
-        onPressed: () => setState(() => gender = val),
-        icon: Icon(icon),
-        label: Text(val),
-        style: OutlinedButton.styleFrom(
-          backgroundColor: isSelected ? Colors.blue.shade50 : Colors.white,
-          side: BorderSide(
-            color: isSelected ? Colors.blue : Colors.grey.shade300,
-          ),
+Widget _genderButton(String val, IconData icon) {
+  bool isSelected = widget.draft.gender == val;
+
+  return Expanded(
+    child: OutlinedButton.icon(
+      onPressed: () {
+        setState(() {
+          widget.draft.gender = val;
+        });
+      },
+      icon: Icon(icon),
+      label: Text(val),
+      style: OutlinedButton.styleFrom(
+        backgroundColor:
+            isSelected ? Colors.blue.shade50 : Colors.white,
+        side: BorderSide(
+          color:
+              isSelected ? Colors.blue : Colors.grey.shade300,
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPenyakitGrid() {
     return Wrap(
       spacing: 6,
       runSpacing: 0,
       children: penyakitKronikList.map((val) {
-        final isSelected = selectedPenyakitKronik.contains(val);
+        final isSelected = widget.draft.penyakitKronik.contains(val);
 
         return OutlinedButton(
           onPressed: () {
             setState(() {
               if (isSelected) {
-                selectedPenyakitKronik.remove(val);
+                widget.draft.penyakitKronik.remove(val);
               } else {
-                selectedPenyakitKronik.add(val);
+                widget.draft.penyakitKronik.add(val);
               }
             });
           },
@@ -311,11 +403,8 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
   Future<void> _selectDate(BuildContext context) async {
     DateTime initialDate = DateTime.now();
 
-    // Try parsing existing typed date
-    if (dateController.text.isNotEmpty) {
-      try {
-        initialDate = DateTime.parse(dateController.text);
-      } catch (_) {}
+    if (widget.draft.lastClinicVisit != null) {
+      initialDate = widget.draft.lastClinicVisit!;
     }
 
     DateTime? picked = await showDatePicker(
@@ -326,8 +415,12 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
     );
 
     if (picked != null) {
+      widget.draft.lastClinicVisit = picked;
+
       dateController.text =
-          "${picked.day}-${picked.month}-${picked.year}";
+          "${picked.day.toString().padLeft(2, '0')}-"
+          "${picked.month.toString().padLeft(2, '0')}-"
+          "${picked.year}";
     }
   }
 }

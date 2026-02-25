@@ -1,5 +1,6 @@
 // Step 2: Simptom Pesakit
 import 'package:flutter/material.dart';
+import 'package:kitahack_app/features/triage/triage_page.dart';
 
 
 class Symptom {
@@ -29,7 +30,11 @@ class SymptomCategory {
 }
 
 class SymptomsStep extends StatefulWidget {
-  const SymptomsStep({super.key});
+    final CaseDraft draft;
+    const SymptomsStep({
+      super.key,
+      required this.draft,
+    });
 
   @override
   State<SymptomsStep> createState() => _SymptomsStepState();
@@ -238,10 +243,18 @@ String additionalNotes = "";
           Row(
             children: [
               Checkbox(
-                value: symptom.selected,
+                value: widget.draft.symptoms.containsKey(symptom.label),
                 onChanged: (val) {
                   setState(() {
                     symptom.selected = val ?? false;
+                    if (val == true) {
+                      widget.draft.symptoms[symptom.label] = {
+                        "selected": true,
+                        "extra": null,
+                      };
+                    } else {
+                      widget.draft.symptoms.remove(symptom.label);
+                    }
                   });
                 },
               ),
@@ -254,21 +267,29 @@ String additionalNotes = "";
             ],
           ),
 
-          if (symptom.selected) ...[
+          if (widget.draft.symptoms.containsKey(symptom.label)) ...[
             if (symptom.label == "Batuk") ...[
               const SizedBox(height: 8),
               Row(
                 children: [
                   _buildSmallSelectionButton(
-                    currentValue: symptom.type,
+                    currentValue: widget.draft.symptoms[symptom.label]?["type"] ?? "",
                     buttonValue: "Kering",
-                    onSelected: (val) => symptom.type = val,
+                    onSelected: (val) {
+                      setState(() {
+                        widget.draft.symptoms[symptom.label]!["type"] = val;
+                      });
+                    },
                   ),
                   const SizedBox(width: 12),
                   _buildSmallSelectionButton(
-                    currentValue: symptom.type,
+                    currentValue: widget.draft.symptoms[symptom.label]?["type"] ?? "",
                     buttonValue: "Berkahak",
-                    onSelected: (val) => symptom.type = val,
+                    onSelected: (val) {
+                      setState(() {
+                        widget.draft.symptoms[symptom.label]!["type"] = val;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -278,10 +299,12 @@ String additionalNotes = "";
 
             TextField(
               onChanged: (value) {
-                symptom.note = value;
+                widget.draft.symptoms[symptom.label]!["extra"] =
+                int.tryParse(value);
               },
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: "Nyatakan butiran...",
+                hintText: "sejak berapa hari?",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
@@ -347,7 +370,7 @@ String additionalNotes = "";
         TextField(
           maxLines: 5,
           onChanged: (value) {
-            additionalNotes = value;
+            widget.draft.additionalNotes = value;
           },
           decoration: InputDecoration(
             hintText: "Masukkan catatan tambahan di sini...",

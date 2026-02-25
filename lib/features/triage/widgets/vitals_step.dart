@@ -2,6 +2,7 @@
 // lib/features/triage/widgets/vitals_step.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kitahack_app/features/triage/triage_page.dart';
 
 
 class BloodPressureFormatter extends TextInputFormatter {
@@ -25,17 +26,17 @@ class BloodPressureFormatter extends TextInputFormatter {
 
 
 class VitalsStep extends StatefulWidget {
-  const VitalsStep({super.key});
+  final CaseDraft draft;
+  const VitalsStep({
+    super.key,
+    required this.draft,
+  });
   
   @override
   State<VitalsStep> createState() => _VitalsStepState();
 }
 
 class _VitalsStepState extends State<VitalsStep> {
-
-  String gulaDarahType = "";
-  String dengueResult = "";
-  String malariaResult = "";
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +51,26 @@ class _VitalsStepState extends State<VitalsStep> {
               Expanded(
                 child: _buildVitalItem(
                   "Suhu Badan",
-                  "36.5", 
+                  "",
                   "°C", 
-                  "Normal: 36.5-37.5"
+                  "Normal: 36.5-37.5",
+                  onChanged: (value) {
+                    widget.draft.vitals["suhu"] =
+                    double.tryParse(value);
+                  }
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildVitalItem(
                   "Kadar Nadi",
-                  "80",
+                  "",
                   "/min",
                   "Normal: 60-100",
+                  onChanged: (value) {
+                    widget.draft.vitals["nadi"] =
+                    double.tryParse(value);
+                  }
                 ),
               ),
             ],
@@ -73,9 +82,13 @@ class _VitalsStepState extends State<VitalsStep> {
               Expanded(
                 child: _buildVitalItem(
                   "Tekanan Darah",
-                  "120/80",
+                  "",
                   "mmHg",
                   "Normal: 90/60 - 120/80",
+                  onChanged: (value) {
+                    widget.draft.vitals["bp"] =
+                    double.tryParse(value);
+                  }
                 )
               ),
               const SizedBox(width: 16),
@@ -83,9 +96,13 @@ class _VitalsStepState extends State<VitalsStep> {
               Expanded(
                 child: _buildVitalItem(
                   "Kadar Pernafasan",
-                  "16",
+                  "",
                   "/min",
                   "Normal: 12-20",
+                  onChanged: (value) {
+                    widget.draft.vitals["kadar pernafasan"] =
+                    double.tryParse(value);
+                  }
                 ),
               ),
               const SizedBox(width: 16),
@@ -131,21 +148,28 @@ class _VitalsStepState extends State<VitalsStep> {
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("5.5", "mmol/L"),
+                        _buildRoundedTextField(
+                          "",
+                          "mmol/L",
+                          onChanged: (value) {
+                            widget.draft.vitals["gula darah"] =
+                            double.tryParse(value);
+                          },
+                        ),
                         const SizedBox(height: 10),
 
                         Row(
                           children: [
                             _selectionButton(
-                              currentValue: gulaDarahType,
+                              currentValue: widget.draft.vitals["gula darah type"] ?? "",
                               buttonValue: "Puasa",
-                              onSelected: (val) => gulaDarahType = val,
+                              onSelected: (val) => widget.draft.vitals["gula darah type"] = val,
                             ),
                             const SizedBox(width: 12),
                             _selectionButton(
-                              currentValue: gulaDarahType,
+                              currentValue: widget.draft.vitals["gula darah type"] ?? "",
                               buttonValue: "Rawak",
-                              onSelected: (val) => gulaDarahType = val,
+                              onSelected: (val) => widget.draft.vitals["gula darah type"] = val,
                             ),
                           ],
                         ),
@@ -157,7 +181,14 @@ class _VitalsStepState extends State<VitalsStep> {
                           style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 8),
-                        _buildRoundedTextField("13.5", "g/dL"),
+                        _buildRoundedTextField(
+                          "",
+                          "g/dL",
+                          onChanged: (value) {
+                            widget.draft.vitals["hemoglobin"] =
+                            double.tryParse(value);
+                          },
+                        ),
                         const SizedBox(height: 20),
 
                         const Text(
@@ -170,19 +201,19 @@ class _VitalsStepState extends State<VitalsStep> {
                           runSpacing: 12,
                           children: [
                             _selectionButton(
-                              currentValue: dengueResult,
+                              currentValue: widget.draft.vitals["dengue"] ?? "",
                               buttonValue: "Positif",
-                              onSelected: (val) => dengueResult = val,
+                              onSelected: (val) => widget.draft.vitals["dengue"] = val,
                             ),
                             _selectionButton(
-                              currentValue: dengueResult,
+                              currentValue: widget.draft.vitals["dengue"] ?? "",
                               buttonValue: "Negatif",
-                              onSelected: (val) => dengueResult = val,
+                              onSelected: (val) => widget.draft.vitals["dengue"] = val,
                             ),
                             _selectionButton(
-                              currentValue: dengueResult,
+                              currentValue: widget.draft.vitals["dengue"] ?? "",
                               buttonValue: "Tidak Dibuat",
-                              onSelected: (val) => dengueResult = val,
+                              onSelected: (val) => widget.draft.vitals["dengue"] = val,
                             ),
                           ],
                         ),
@@ -200,19 +231,19 @@ class _VitalsStepState extends State<VitalsStep> {
                           runSpacing: 12,
                           children: [
                             _selectionButton(
-                              currentValue: malariaResult,
+                              currentValue: widget.draft.vitals["malaria"] ?? "",
                               buttonValue: "Positif",
-                              onSelected: (val) => malariaResult = val,
+                              onSelected: (val) => widget.draft.vitals["malaria"] = val,
                             ),
                             _selectionButton(
-                              currentValue: malariaResult,
+                              currentValue: widget.draft.vitals["malaria"] ?? "",
                               buttonValue: "Negatif",
-                              onSelected: (val) => malariaResult = val,
+                              onSelected: (val) => widget.draft.vitals["malaria"] = val,
                             ),
                             _selectionButton(
-                              currentValue: malariaResult,
+                              currentValue: widget.draft.vitals["malaria"] ?? "",
                               buttonValue: "Tidak Dibuat",
-                              onSelected: (val) => malariaResult = val,
+                              onSelected: (val) => widget.draft.vitals["malaria"] = val,
                             ),
                           ],
                         ),
@@ -229,12 +260,13 @@ class _VitalsStepState extends State<VitalsStep> {
     );
   }
 
-Widget _buildVitalField(
-  String value,
-  String unit,
-  String hint, {
-  List<TextInputFormatter>? inputFormatters,
-  TextInputType keyboardType = TextInputType.number,
+  Widget _buildVitalField(
+    String value,
+    String unit,
+    String hint, {
+    List<TextInputFormatter>? inputFormatters,
+    TextInputType keyboardType = TextInputType.number,
+    Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,6 +275,7 @@ Widget _buildVitalField(
           initialValue: value,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
+          onChanged: onChanged,
           decoration: InputDecoration(
             suffixText: unit,
             contentPadding: const EdgeInsets.symmetric(
@@ -263,13 +296,14 @@ Widget _buildVitalField(
     );
   }
 
-Widget _buildVitalItem(
-  String label,
-  String value,
-  String unit,
-  String hint, {
-  List<TextInputFormatter>? inputFormatters,
-  TextInputType keyboardType = TextInputType.number,
+  Widget _buildVitalItem(
+    String label,
+    String value,
+    String unit,
+    String hint, {
+    List<TextInputFormatter>? inputFormatters,
+    TextInputType keyboardType = TextInputType.number,
+    Function(String)? onChanged,  
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,30 +315,35 @@ Widget _buildVitalItem(
           hint,
           inputFormatters: inputFormatters,
           keyboardType: keyboardType,
+          onChanged: onChanged,   
         ),
       ],
     );
   }
 
-    Widget _buildRoundedTextField(
-      String hint, 
-      String suffix, 
-    ){
+  Widget _buildRoundedTextField(
+    String hint,
+    String suffix, {
+    TextInputType keyboardType = TextInputType.text,
+    Function(String)? onChanged,
+  }) {
     return TextField(
+      keyboardType: keyboardType,
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hint,
         suffixText: suffix,
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-    enabledBorder: OutlineInputBorder( 
-      borderRadius: BorderRadius.circular(20),
-      borderSide: BorderSide(color: Colors.grey.shade400),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
-      borderSide: const BorderSide(color: Colors.blue),
-    ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
       ),
     );
   }
@@ -356,6 +395,10 @@ Widget _buildVitalItem(
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(3),
             ],
+            onChanged: (value) {
+              widget.draft.vitals["suhu"] =
+              double.tryParse(value);
+            },
             decoration: InputDecoration(
               hintText: "",
               suffixText: "%",
