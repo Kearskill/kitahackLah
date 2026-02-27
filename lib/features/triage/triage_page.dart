@@ -5,6 +5,7 @@ import 'widgets/symptoms_step.dart';
 import 'widgets/vitals_step.dart';
 import 'widgets/analysis_view.dart';
 import 'widgets/step_indicator.dart';
+import 'package:kitahack_app/core/services/ai_diagnosis_service.dart';
 
 
 class CaseDraft {
@@ -25,6 +26,52 @@ class CaseDraft {
   bool isFollowUp = false;
 
   String additionalNotes = "";
+
+  // ADD THIS: Store AI result
+  DiagnosisResult? aiResult;
+  
+  /// Convert symptoms map to readable string for AI
+  String getSymptomsText() {
+    if (symptoms.isEmpty && additionalNotes.isEmpty) {
+      return "Tiada simptom dilaporkan";
+    }
+    
+    List<String> symptomList = [];
+    
+    symptoms.forEach((symptom, details) {
+      String entry = symptom;
+      if (details['type'] != null) {
+        entry += " (${details['type']})";
+      }
+      if (details['extra'] != null) {
+        entry += " sejak ${details['extra']} hari";
+      }
+      symptomList.add(entry);
+    });
+    
+    String result = symptomList.join(", ");
+    
+    if (additionalNotes.isNotEmpty) {
+      result += ". Catatan tambahan: $additionalNotes";
+    }
+    
+    return result;
+  }
+  
+  /// Get duration string from symptoms
+  String? getDurationText() {
+    int? maxDays;
+    symptoms.forEach((_, details) {
+      if (details['extra'] != null && details['extra'] is int) {
+        int days = details['extra'] as int;
+        if (maxDays == null || days > maxDays!) {
+          maxDays = days;
+        }
+      }
+    });
+    return maxDays != null ? "$maxDays hari" : null;
+  }
+
 }
 
 class TriagePage extends StatefulWidget {

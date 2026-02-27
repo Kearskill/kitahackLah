@@ -46,6 +46,9 @@ dependencies:
   floor: 1.4.2
   sqflite: ^2.4.1
 
+  # For making HTTP requests
+  http: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
