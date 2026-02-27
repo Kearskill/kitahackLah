@@ -51,6 +51,7 @@ class _AnalysisViewState extends State<AnalysisView> {
         patientGender: widget.draft.gender.isNotEmpty ? widget.draft.gender : null,
         duration: widget.draft.getDurationText(),
         vitalsText: vitalsText.isNotEmpty ? vitalsText : null,
+        imageBase64: widget.draft.imageBase64,
       );
       
       // Store result in draft

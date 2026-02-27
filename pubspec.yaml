@@ -49,6 +49,9 @@ dependencies:
   # For making HTTP requests
   http: ^1.2.0
 
+  # For picking images from camera or gallery
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

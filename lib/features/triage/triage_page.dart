@@ -27,7 +27,10 @@ class CaseDraft {
 
   String additionalNotes = "";
 
-  // ADD THIS: Store AI result
+  // Store selected image as base64 for AI analysis
+  String? imageBase64;
+
+  // Store AI result
   DiagnosisResult? aiResult;
   
   /// Convert symptoms map to readable string for AI
