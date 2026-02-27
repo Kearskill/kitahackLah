@@ -157,7 +157,7 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                           const SizedBox(height: 16),
                           _buildRoundedTextField(
                             hint: "Nyatakan penyakit kronik lain",
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.text,
                             onChanged: (value) {
                               widget.draft.penyakitKronikLain = value;
                             },

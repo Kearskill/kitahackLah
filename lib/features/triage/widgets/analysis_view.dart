@@ -5,7 +5,6 @@ import 'package:kitahack_app/features/triage/results/case_model.dart';
 import 'package:kitahack_app/features/triage/results/result_page.dart';
 import 'package:kitahack_app/features/triage/results/severity_enum.dart';
 import 'package:kitahack_app/features/triage/triage_page.dart';
-import '../results/triage_result_view.dart';
 
 class AnalysisView extends StatefulWidget {
   final CaseDraft draft;
@@ -63,32 +62,7 @@ class _AnalysisViewState extends State<AnalysisView> {
       ),
     );
   }
-  // void _startAnalysis() {
-  //   // Simulate a 4-second analysis process
-  //   Timer.periodic(const Duration(milliseconds: 100), (timer) {
-  //     setState(() {
-  //       if (_progress < 1.0) {
-  //         _progress += 0.025;
-  //         _taskIndex = (_progress * _tasks.length).floor().clamp(
-  //           0,
-  //           _tasks.length - 1,
-  //         );
-  //       } else {
-  //         timer.cancel();
-  //         _navigateToResults();
-  //       }
-  //     });
-  //   });
-  // }
-
-  void _navigateToResults() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TriageResultView(category: "SEDERAHANA"),
-      ),
-    );
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -171,49 +145,93 @@ class _AnalysisViewState extends State<AnalysisView> {
   }
 
   void _debugPrintDraft() {
-    print("===== DRAFT DATA =====");
+    print("========== DRAFT DATA ==========");
+
+    print("PATIENT INFO: ");
     print("Name: ${widget.draft.name}");
     print("Age: ${widget.draft.age}");
     print("Gender: ${widget.draft.gender}");
     print("Last Clinic Visit: ${widget.draft.lastClinicVisit}");
 
-    print("Chronic Disease: ${widget.draft.penyakitKronik}");
-    print("Chronic Other: ${widget.draft.penyakitKronikLain}");
+    print("\nCHRONIC DISEASE: ");
+    print("Selected: ${widget.draft.penyakitKronik}");
+    print("Other: ${widget.draft.penyakitKronikLain}");
 
-    print("Symptoms:");
-    widget.draft.symptoms.forEach((key, value) {
-      print(" - $key : $value");
-    });
+    print("\nSYMPTOMS: ");
+    if (widget.draft.symptoms.isEmpty) {
+      print("No symptoms selected");
+    } else {
+      widget.draft.symptoms.forEach((key, value) {
+        print("Symptom: $key");
 
-    print("Vitals:");
-    widget.draft.vitals.forEach((key, value) {
-      print(" - $key : $value");
-    });
+        print("   selected: ${value["selected"]}");
+        print("   type: ${value["type"]}");
+        print("   duration(extra): ${value["extra"]}");
+            });
+    }
 
-    print("======================");
+    print("\nVITALS: ");
+    if (widget.draft.vitals.isEmpty) {
+      print("No vitals recorded");
+    } else {
+      widget.draft.vitals.forEach((key, value) {
+        print(" - $key : $value");
+      });
+    }
+
+    print("\nIMAGES: ");
+    if (widget.draft.imageFiles.isEmpty) {
+      print("No images uploaded");
+    } else {
+      for (int i = 0; i < widget.draft.imageFiles.length; i++) {
+        print("Image $i path: ${widget.draft.imageFiles[i]?.path}");
+      }
+    }
+
+    print("=================================");
   }
 
   String _draftToString() {
     final buffer = StringBuffer();
 
+    buffer.writeln("===== PATIENT INFO =====");
     buffer.writeln("Name: ${widget.draft.name}");
     buffer.writeln("Age: ${widget.draft.age}");
     buffer.writeln("Gender: ${widget.draft.gender}");
     buffer.writeln("Last Visit: ${widget.draft.lastClinicVisit}");
 
-    buffer.writeln("\nChronic Disease:");
-    buffer.writeln(widget.draft.penyakitKronik);
+    buffer.writeln("\n===== CHRONIC DISEASE =====");
+    buffer.writeln("Selected: ${widget.draft.penyakitKronik}");
     buffer.writeln("Other: ${widget.draft.penyakitKronikLain}");
 
-    buffer.writeln("\nSymptoms:");
-    widget.draft.symptoms.forEach((key, value) {
-      buffer.writeln("$key → $value");
-    });
+    buffer.writeln("\n===== SYMPTOMS =====");
+    if (widget.draft.symptoms.isEmpty) {
+      buffer.writeln("No symptoms selected");
+    } else {
+      widget.draft.symptoms.forEach((key, value) {
+        buffer.writeln("$key:");
+        buffer.writeln("   type: ${value["type"]}");
+        buffer.writeln("   duration: ${value["extra"]}");
+      });
+    }
 
-    buffer.writeln("\nVitals:");
-    widget.draft.vitals.forEach((key, value) {
-      buffer.writeln("$key → $value");
-    });
+    buffer.writeln("\n===== VITALS =====");
+    if (widget.draft.vitals.isEmpty) {
+      buffer.writeln("No vitals recorded");
+    } else {
+      widget.draft.vitals.forEach((key, value) {
+        buffer.writeln("$key → $value");
+      });
+    }
+
+    buffer.writeln("\n===== IMAGES =====");
+    if (widget.draft.imageFiles.isEmpty) {
+      buffer.writeln("No images uploaded");
+    } else {
+      for (int i = 0; i < widget.draft.imageFiles.length; i++) {
+        buffer.writeln("Image $i: ${widget.draft.imageFiles[i]?.path}");
+      }
+    }
 
     return buffer.toString();
   }

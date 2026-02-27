@@ -1,5 +1,8 @@
 // Step 2: Simptom Pesakit
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kitahack_app/features/triage/triage_page.dart';
 
 
@@ -42,6 +45,7 @@ class SymptomsStep extends StatefulWidget {
 
 class _SymptomsStepState extends State<SymptomsStep> {
 
+final ImagePicker _picker = ImagePicker();
 late List<SymptomCategory> categories;
 
 String searchQuery = "";
@@ -396,45 +400,137 @@ String additionalNotes = "";
     );
   }
 
-  Widget _buildCameraUploadBox(){
+  Widget _buildCameraUploadBox() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          const Text(
-            
-            "Gambar (Pilihan)",
-                    style: TextStyle(
+        const Text(
+          "Gambar (Pilihan)",
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
-            ),
-          const SizedBox(height: 12),
-          Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey.shade300,
-                style: BorderStyle.solid,
+        ),
+        const SizedBox(height: 12),
+
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _pickFromCamera,
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text("Imbas"),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _pickFromGallery,
+                      icon: const Icon(Icons.photo),
+                      label: const Text("Galeri"),
+                    ),
+                  ),
+                ],
               ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt_outlined, color: Colors.grey),
-                Text(
-                  "Ambil atau muat naik gambar",
-                  style: TextStyle(color: Colors.grey),
+
+              if (widget.draft.imageFiles.isNotEmpty) ...[
+                const SizedBox(height: 16),
+
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: widget.draft.imageFiles.length,
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemBuilder: (context, index) {
+                    final file =
+                        widget.draft.imageFiles[index];
+
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(10),
+                          child: Image.file(
+                            file!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                widget.draft.imageFiles
+                                    .removeAt(index);
+                              });
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              padding:
+                                  const EdgeInsets.all(4),
+                              child: const Icon(
+                                Icons.close,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
-            ),
+            ],
           ),
-    ],
+        ),
+      ],
     );
+  }
+  
+  Future<void> _pickFromCamera() async {
+    final XFile? photo =
+        await _picker.pickImage(source: ImageSource.camera);
 
+    if (photo != null) {
+      setState(() {
+        widget.draft.imageFiles.add(File(photo.path));
+      });
+    }
   }
 
+  Future<void> _pickFromGallery() async {
+    final List<XFile>? images =
+        await _picker.pickMultiImage();
+
+    if (images != null && images.isNotEmpty) {
+      setState(() {
+        widget.draft.imageFiles
+            .addAll(images.map((e) => File(e.path)));
+      });
+    }
+  }
 
   // Widget _buildSymptomExtraField(Symptom symptom) {
   //   return Padding(
