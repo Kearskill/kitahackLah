@@ -187,7 +187,7 @@ class _PatientInfoStepState extends State<PatientInfoStep> {
                         _buildRoundedTextField(
                           hint : "Senarai ubat diambil", 
                           onChanged: (value){
-                            widget.draft.currentMeedication = value;
+                            widget.draft.currentMedication = value;
                           }
                         ),
                         const SizedBox(height: 20),

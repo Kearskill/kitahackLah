@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class AIDiagnosisService {
   static const String _baseUrl = 'https://asia-southeast1-doctelemy-73257.cloudfunctions.net';
-  
+
   /// Call the AI diagnosis endpoint
   static Future<DiagnosisResult> getDiagnosis({
     required String symptoms,
@@ -11,15 +11,17 @@ class AIDiagnosisService {
     String? patientGender,
     String? duration,
     String? imageBase64,
+    String? vitalsText,
   }) async {
     final uri = Uri.parse('$_baseUrl/getDiagnosis');
-    
-    final body = {
+
+    final body = <String, dynamic>{
       'symptoms': symptoms,
       if (patientAge != null) 'patient_age': patientAge,
       if (patientGender != null) 'patient_gender': patientGender,
       if (duration != null) 'duration': duration,
       if (imageBase64 != null) 'image_base64': imageBase64,
+      if (vitalsText != null && vitalsText.isNotEmpty) 'vitals_text': vitalsText,
     };
 
     try {
@@ -27,7 +29,7 @@ class AIDiagnosisService {
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -69,7 +71,8 @@ class DiagnosisResult {
   final String recommendedAction;
   final List<String> redFlags;
   final bool referralNeeded;
-  final String referralUrgency; // Segera, Dalam 24 jam, Tidak segera
+  final String referralUrgency; // Segera, Dalam 24 jam, Tidak perlu
+  final List<String> additionalQuestions;
   final String disclaimer;
 
   DiagnosisResult({
@@ -81,22 +84,29 @@ class DiagnosisResult {
     required this.redFlags,
     required this.referralNeeded,
     required this.referralUrgency,
+    this.additionalQuestions = const [],
     required this.disclaimer,
   });
 
   factory DiagnosisResult.fromJson(Map<String, dynamic> json) {
+    // Unwrap if cloud function returned error with nested fallback data
+    final data = (json.containsKey('fallback') && json['fallback'] is Map)
+        ? json['fallback'] as Map<String, dynamic>
+        : json;
+
     return DiagnosisResult(
-      isEmergency: json['is_emergency'] ?? false,
-      emergencyMessage: json['emergency_message'],
-      possibleConditions: (json['possible_conditions'] as List? ?? [])
-          .map((c) => PossibleCondition.fromJson(c))
+      isEmergency: data['is_emergency'] ?? false,
+      emergencyMessage: data['emergency_message'],
+      possibleConditions: (data['possible_conditions'] as List? ?? [])
+          .map((c) => PossibleCondition.fromJson(c as Map<String, dynamic>))
           .toList(),
-      severity: json['severity'] ?? 'Tidak dapat ditentukan',
-      recommendedAction: json['recommended_action'] ?? '',
-      redFlags: List<String>.from(json['red_flags'] ?? []),
-      referralNeeded: json['referral_needed'] ?? false,
-      referralUrgency: json['referral_urgency'] ?? 'Tidak segera',
-      disclaimer: json['disclaimer'] ?? '',
+      severity: data['severity'] ?? 'Tidak dapat ditentukan',
+      recommendedAction: data['recommended_action'] ?? '',
+      redFlags: List<String>.from(data['red_flags'] ?? []),
+      referralNeeded: data['referral_needed'] ?? false,
+      referralUrgency: data['referral_urgency'] ?? 'Tidak perlu',
+      additionalQuestions: List<String>.from(data['additional_questions'] ?? []),
+      disclaimer: data['disclaimer'] ?? '',
     );
   }
 }

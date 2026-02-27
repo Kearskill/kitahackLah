@@ -29,7 +29,6 @@ class _AnalysisViewState extends State<AnalysisView> {
   @override
   void initState() {
     super.initState();
-    _debugPrintDraft();
     _startAnalysis();
   }
 
@@ -45,11 +44,13 @@ class _AnalysisViewState extends State<AnalysisView> {
       await _updateProgress(2, 0.75);
       
       // Call the actual AI API
+      final vitalsText = widget.draft.getVitalsText();
       final result = await AIDiagnosisService.getDiagnosis(
         symptoms: widget.draft.getSymptomsText(),
         patientAge: widget.draft.age > 0 ? widget.draft.age : null,
         patientGender: widget.draft.gender.isNotEmpty ? widget.draft.gender : null,
         duration: widget.draft.getDurationText(),
+        vitalsText: vitalsText.isNotEmpty ? vitalsText : null,
       );
       
       // Store result in draft
@@ -240,13 +241,4 @@ class _AnalysisViewState extends State<AnalysisView> {
     );
   }
 
-  void _debugPrintDraft() {
-    print("===== SENDING TO AI =====");
-    print("Name: ${widget.draft.name}");
-    print("Age: ${widget.draft.age}");
-    print("Gender: ${widget.draft.gender}");
-    print("Symptoms Text: ${widget.draft.getSymptomsText()}");
-    print("Duration: ${widget.draft.getDurationText()}");
-    print("=========================");
-  }
 }

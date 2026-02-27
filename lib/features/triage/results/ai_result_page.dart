@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_app/core/services/ai_diagnosis_service.dart';
+import 'package:kitahack_app/core/services/database_service.dart';
+import 'package:kitahack_app/features/triage/data/triage_model.dart';
+import 'package:kitahack_app/features/triage/data/triage_repository.dart';
 import 'package:kitahack_app/features/triage/triage_page.dart';
 
-class AIResultPage extends StatelessWidget {
+class AIResultPage extends StatefulWidget {
   final CaseDraft draft;
   final DiagnosisResult result;
 
@@ -11,6 +14,75 @@ class AIResultPage extends StatelessWidget {
     required this.draft,
     required this.result,
   });
+
+  @override
+  State<AIResultPage> createState() => _AIResultPageState();
+}
+
+class _AIResultPageState extends State<AIResultPage> {
+  bool _isSaving = false;
+  bool _isSaved = false;
+
+  CaseDraft get draft => widget.draft;
+  DiagnosisResult get result => widget.result;
+
+  bool get _isSevere =>
+      result.isEmergency ||
+      result.severity == 'Teruk' ||
+      result.severity == 'Kritikal' ||
+      result.severity == 'Tinggi';
+
+  Color _getHeaderColor() {
+    if (_isSevere) return Colors.red.shade100;
+    if (result.severity == 'Sederhana') return Colors.orange.shade100;
+    return Colors.green.shade100;
+  }
+
+  Color _getAccentColor() {
+    if (_isSevere) return Colors.red.shade900;
+    if (result.severity == 'Sederhana') return Colors.orange.shade900;
+    return Colors.green.shade900;
+  }
+
+  Future<void> _saveCase() async {
+    if (_isSaved || _isSaving) return;
+    setState(() => _isSaving = true);
+
+    try {
+      final record = TriageRecord(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: draft.name,
+        age: draft.age,
+        gender: draft.gender,
+        symptoms: draft.getSymptomsText(),
+        temperature: (draft.vitals['suhu'] as double?) ?? 0.0,
+        heartRate: ((draft.vitals['nadi'] as double?) ?? 0.0).toInt(),
+        respiratoryRate:
+            ((draft.vitals['kadar pernafasan'] as double?) ?? 0.0).toInt(),
+        bloodPressure: (draft.vitals['bp'] as String?) ?? '',
+        triageLevel: result.severity,
+        timestamp: DateTime.now().toIso8601String(),
+      );
+
+      final repository = TriageRepository(DatabaseService().triageDao);
+      await repository.saveTriage(record);
+
+      if (!mounted) return;
+      setState(() {
+        _isSaving = false;
+        _isSaved = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kes berjaya disimpan!")),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ralat menyimpan kes: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +97,7 @@ class AIResultPage extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: _getAccentColor().withOpacity(0.4),
+                color: _getAccentColor().withValues(alpha: 0.4),
                 width: 5,
               ),
             ),
@@ -82,52 +154,20 @@ class AIResultPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Emergency message
             if (result.isEmergency && result.emergencyMessage != null)
               _buildEmergencyCard(),
-            
-            // Patient info summary
             _buildPatientSummary(),
-            
-            // Possible conditions
-            if (result.possibleConditions.isNotEmpty)
-              _buildConditionsCard(),
-            
-            // Recommended action
+            if (result.possibleConditions.isNotEmpty) _buildConditionsCard(),
             _buildActionCard(),
-            
-            // Red flags to watch
-            if (result.redFlags.isNotEmpty)
-              _buildRedFlagsCard(),
-            
-            // Referral info
-            if (result.referralNeeded)
-              _buildReferralCard(),
-            
-            // Disclaimer
+            if (result.redFlags.isNotEmpty) _buildRedFlagsCard(),
+            if (result.additionalQuestions.isNotEmpty)
+              _buildAdditionalQuestionsCard(),
+            if (result.referralNeeded) _buildReferralCard(),
             _buildDisclaimerCard(),
           ],
         ),
       ),
     );
-  }
-
-  Color _getHeaderColor() {
-    if (result.isEmergency || result.severity == "Teruk") {
-      return Colors.red.shade100;
-    } else if (result.severity == "Sederhana") {
-      return Colors.orange.shade100;
-    }
-    return Colors.green.shade100;
-  }
-
-  Color _getAccentColor() {
-    if (result.isEmergency || result.severity == "Teruk") {
-      return Colors.red.shade900;
-    } else if (result.severity == "Sederhana") {
-      return Colors.orange.shade900;
-    }
-    return Colors.green.shade900;
   }
 
   Widget _buildEmergencyCard() {
@@ -281,11 +321,34 @@ class AIResultPage extends StatelessWidget {
     );
   }
 
+  Widget _buildAdditionalQuestionsCard() {
+    return _buildCard(
+      title: "Soalan Tambahan",
+      icon: Icons.help_outline,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: result.additionalQuestions.map((q) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.circle, size: 8, color: Colors.blue.shade400),
+                const SizedBox(width: 8),
+                Expanded(child: Text(q)),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildReferralCard() {
-    Color urgencyColor = result.referralUrgency == "Segera" 
-        ? Colors.red 
+    Color urgencyColor = result.referralUrgency == "Segera"
+        ? Colors.red
         : (result.referralUrgency == "Dalam 24 jam" ? Colors.orange : Colors.blue);
-    
+
     return _buildCard(
       title: "Rujukan Diperlukan",
       icon: Icons.local_hospital,
@@ -299,7 +362,7 @@ class AIResultPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: urgencyColor.withOpacity(0.15),
+                  color: urgencyColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -387,37 +450,38 @@ class AIResultPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade300),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),
       child: Row(
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {
-                // TODO: Save case to database
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Kes disimpan!")),
-                );
-              },
+              onPressed: (_isSaving || _isSaved) ? null : _saveCase,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2962FF),
+                backgroundColor: _isSaved ? Colors.green : const Color(0xFF2962FF),
+                disabledBackgroundColor: _isSaved ? Colors.green : Colors.grey.shade300,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text(
-                "Simpan Kes",
-                style: TextStyle(color: Colors.white),
-              ),
+              child: _isSaving
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      _isSaved ? "Kes Disimpan ✓" : "Simpan Kes",
+                      style: const TextStyle(color: Colors.white),
+                    ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: OutlinedButton(
-              onPressed: () {
-                // Navigate back to home
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
+              onPressed: () =>
+                  Navigator.of(context).popUntil((route) => route.isFirst),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),

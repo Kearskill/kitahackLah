@@ -13,7 +13,7 @@ class CaseDraft {
   int age = 0;
   String gender = "";
   String drugAllergy = "";
-  String currentMeedication = "";
+  String currentMedication = "";
 
   Map<String, Map<String, dynamic>> symptoms = {};
   Map<String, dynamic> vitals = {};
@@ -58,6 +58,25 @@ class CaseDraft {
     return result;
   }
   
+  /// Format vitals map into a readable string for AI
+  String getVitalsText() {
+    if (vitals.isEmpty) return '';
+    final parts = <String>[];
+    if (vitals['suhu'] != null) parts.add('Suhu: ${vitals['suhu']}°C');
+    if (vitals['nadi'] != null) parts.add('Nadi: ${vitals['nadi']}/min');
+    if (vitals['bp'] != null && (vitals['bp'] as String).isNotEmpty) parts.add('Tekanan Darah: ${vitals['bp']} mmHg');
+    if (vitals['kadar pernafasan'] != null) parts.add('Pernafasan: ${vitals['kadar pernafasan']}/min');
+    if (vitals['spo2'] != null) parts.add('SpO2: ${vitals['spo2']}%');
+    if (vitals['gula darah'] != null) {
+      final type = vitals['gula darah type'] as String? ?? '';
+      parts.add('Gula Darah${type.isNotEmpty ? " ($type)" : ""}: ${vitals['gula darah']} mmol/L');
+    }
+    if (vitals['hemoglobin'] != null) parts.add('Hemoglobin: ${vitals['hemoglobin']} g/dL');
+    if (vitals['dengue'] != null && vitals['dengue'] != 'Tidak Dibuat') parts.add('Dengue: ${vitals['dengue']}');
+    if (vitals['malaria'] != null && vitals['malaria'] != 'Tidak Dibuat') parts.add('Malaria: ${vitals['malaria']}');
+    return parts.join(', ');
+  }
+
   /// Get duration string from symptoms
   String? getDurationText() {
     int? maxDays;
