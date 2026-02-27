@@ -1,3 +1,4 @@
+// lib\features\triage\widgets\analysis_view.dart
 // AI Processing Screen
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -9,10 +10,7 @@ import 'package:kitahack_app/features/triage/triage_page.dart';
 class AnalysisView extends StatefulWidget {
   final CaseDraft draft;
 
-  const AnalysisView({
-    super.key,
-    required this.draft,
-  });
+  const AnalysisView({super.key, required this.draft});
 
   @override
   State<AnalysisView> createState() => _AnalysisViewState();
@@ -37,7 +35,6 @@ class _AnalysisViewState extends State<AnalysisView> {
     _startAnalysis();
   }
 
-
   Future<void> _startAnalysis() async {
     await Future.delayed(const Duration(seconds: 2));
 
@@ -55,14 +52,41 @@ class _AnalysisViewState extends State<AnalysisView> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => ResultPage(
-          caseData: newCase,
-          isReadOnly: false,
-        ),
+        builder: (_) => ResultPage(caseData: newCase, isReadOnly: false),
       ),
     );
   }
+<<<<<<< front
  
+=======
+  // void _startAnalysis() {
+  //   // Simulate a 4-second analysis process
+  //   Timer.periodic(const Duration(milliseconds: 100), (timer) {
+  //     setState(() {
+  //       if (_progress < 1.0) {
+  //         _progress += 0.025;
+  //         _taskIndex = (_progress * _tasks.length).floor().clamp(
+  //           0,
+  //           _tasks.length - 1,
+  //         );
+  //       } else {
+  //         timer.cancel();
+  //         _navigateToResults();
+  //       }
+  //     });
+  //   });
+  // }
+
+  // comment sekejap
+  // void _navigateToResults() {
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const TriageResultView(category: "SEDERAHANA"),
+  //     ),
+  //   );
+  // }
+>>>>>>> master
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +96,7 @@ class _AnalysisViewState extends State<AnalysisView> {
           padding: const EdgeInsets.all(32.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            // REMOVED 'const' from the list below
             children: [
               // Central Icon with Gradient
               Container(
@@ -81,6 +106,7 @@ class _AnalysisViewState extends State<AnalysisView> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: const Icon(
+                  // Added const here
                   Icons.analytics_outlined,
                   size: 64,
                   color: Colors.blue,
@@ -93,12 +119,12 @@ class _AnalysisViewState extends State<AnalysisView> {
               ),
               const SizedBox(height: 48),
 
-              // Animated Task List
+              // Animated Task List (Dynamic - cannot be const)
               ...List.generate(_tasks.length, (index) => _buildTaskItem(index)),
 
               const SizedBox(height: 40),
               LinearProgressIndicator(
-                value: _progress,
+                value: _progress, // Dynamic value
                 backgroundColor: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(8),
                 minHeight: 10,
