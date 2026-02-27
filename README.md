@@ -78,3 +78,24 @@ How it aligns with AI and SDGs.
 
  Technical Implementation Overview of technologies used, including Google tools.
 Explanation of implementation, innovation, and challenges faced.
+
+
+npm install -g firebase-tools
+
+dart pub global activate flutterfire_cli
+
+dart run build_runner build
+
+dart pub global activate flutterfire_cli
+
+dart pub global run flutterfire configure
+
+& "C:\Users\User\AppData\Local\Pub\Cache\bin\flutterfire.bat" configure
+
+environmental variables
+
+```
+lib/firebase_options.dart
+firebase.json
+android\app\google-services.json
+```

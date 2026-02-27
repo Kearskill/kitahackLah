@@ -1,0 +1,1 @@
+enum Severity { ringan, sederhana, teruk }
