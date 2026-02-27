@@ -1,4 +1,6 @@
 // lib/features/triage/triage_page.dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'widgets/patient_info_step.dart';
 import 'widgets/symptoms_step.dart';
@@ -25,6 +27,7 @@ class CaseDraft {
   bool isFollowUp = false;
 
   String additionalNotes = "";
+  List<File?> imageFiles = []; 
 }
 
 class TriagePage extends StatefulWidget {
