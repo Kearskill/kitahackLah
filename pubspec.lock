@@ -209,16 +209,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
-<<<<<<< front
-  cross_file:
-    dependency: transitive
-    description:
-      name: cross_file
-      sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.5+2"
-=======
   convert:
     dependency: transitive
     description:
@@ -227,7 +217,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
->>>>>>> master
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.5+2"
   crypto:
     dependency: transitive
     description:
@@ -284,7 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
-<<<<<<< front
   file_selector_linux:
     dependency: transitive
     description:
@@ -317,7 +313,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+5"
-=======
   firebase_auth:
     dependency: "direct main"
     description:
@@ -422,7 +417,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.2"
->>>>>>> master
   flutter:
     dependency: "direct main"
     description: flutter
@@ -510,8 +504,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
-<<<<<<< front
-=======
   http_multi_server:
     dependency: transitive
     description:
@@ -520,7 +512,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
->>>>>>> master
   http_parser:
     dependency: transitive
     description:
@@ -537,7 +528,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.7.2"
-<<<<<<< front
   image_picker:
     dependency: "direct main"
     description:
@@ -602,7 +592,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
-=======
   io:
     dependency: transitive
     description:
@@ -627,7 +616,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
->>>>>>> master
   leak_tracker:
     dependency: transitive
     description:
@@ -708,8 +696,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-<<<<<<< front
-=======
   native_toolchain_c:
     dependency: transitive
     description:
@@ -726,7 +712,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
->>>>>>> master
   path:
     dependency: transitive
     description:
