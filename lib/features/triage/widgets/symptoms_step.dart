@@ -583,17 +583,17 @@ String additionalNotes = "";
     }
   }
 
-  Future<void> _pickFromGallery() async {
-    final List<XFile>? images =
-        await _picker.pickMultiImage();
+  // Future<void> _pickFromGallery() async {
+  //   final List<XFile>? images =
+  //       await _picker.pickMultiImage();
 
-    if (images != null && images.isNotEmpty) {
-      setState(() {
-        widget.draft.imageFiles
-            .addAll(images.map((e) => File(e.path)));
-      });
-    }
-  }
+  //   if (images != null && images.isNotEmpty) {
+  //     setState(() {
+  //       widget.draft.imageFiles
+  //           .addAll(images.map((e) => File(e.path)));
+  //     });
+  //   }
+  // }
 
   // Widget _buildSymptomExtraField(Symptom symptom) {
   //   return Padding(
