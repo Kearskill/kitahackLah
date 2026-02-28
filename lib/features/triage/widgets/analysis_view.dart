@@ -1,11 +1,8 @@
-// lib\features\triage\widgets\analysis_view.dart
-// AI Processing Screen
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:kitahack_app/features/triage/results/case_model.dart';
-import 'package:kitahack_app/features/triage/results/result_page.dart';
-import 'package:kitahack_app/features/triage/results/severity_enum.dart';
+import 'package:kitahack_app/core/services/ai_diagnosis_service.dart';
 import 'package:kitahack_app/features/triage/triage_page.dart';
+import 'package:kitahack_app/features/triage/results/ai_result_page.dart';
 
 class AnalysisView extends StatefulWidget {
   final CaseDraft draft;
@@ -19,74 +16,96 @@ class AnalysisView extends StatefulWidget {
 class _AnalysisViewState extends State<AnalysisView> {
   double _progress = 0.0;
   int _taskIndex = 0;
+  String? _errorMessage;
+  bool _isAnalyzing = true;
 
   final List<String> _tasks = [
     "Memeriksa tanda bahaya...",
-    "Membanding dengan kes serupa...",
-    "Menghasilkan cadangan...",
-    "Menyediakan laporan...",
+    "Menghantar data ke AI...",
+    "Menganalisis simptom...",
+    "Menyediakan cadangan...",
   ];
 
   @override
   void initState() {
     super.initState();
-
-    _debugPrintDraft();
     _startAnalysis();
   }
 
   Future<void> _startAnalysis() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final newCase = CaseModel(
-      name: widget.draft.name,
-      age: widget.draft.age,
-      gender: widget.draft.gender,
-      severity: Severity.sederhana,
-      primaryDiagnosis: "Pneumonia (suspek)",
-      createdAt: DateTime.now(),
-    );
-
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ResultPage(caseData: newCase, isReadOnly: false),
-      ),
-    );
+    // Task 1: Red flag check
+    await _updateProgress(0, 0.25);
+    
+    // Task 2: Sending to AI
+    await _updateProgress(1, 0.5);
+    
+    try {
+      // Task 3: Analyzing
+      await _updateProgress(2, 0.75);
+      
+      // Call the actual AI API
+      final vitalsText = widget.draft.getVitalsText();
+      final result = await AIDiagnosisService.getDiagnosis(
+        symptoms: widget.draft.getSymptomsText(),
+        patientAge: widget.draft.age > 0 ? widget.draft.age : null,
+        patientGender: widget.draft.gender.isNotEmpty ? widget.draft.gender : null,
+        duration: widget.draft.getDurationText(),
+        vitalsText: vitalsText.isNotEmpty ? vitalsText : null,
+        imageBase64: widget.draft.imageBase64,
+      );
+      
+      // Store result in draft
+      widget.draft.aiResult = result;
+      
+      // Task 4: Complete
+      await _updateProgress(3, 1.0);
+      
+      // Small delay to show completion
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (!mounted) return;
+      
+      // Navigate to AI result page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AIResultPage(
+            draft: widget.draft,
+            result: result,
+          ),
+        ),
+      );
+      
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() {
+        _isAnalyzing = false;
+        _errorMessage = e is AIDiagnosisException 
+            ? e.message 
+            : "Ralat rangkaian. Sila cuba lagi.";
+      });
+    }
   }
-<<<<<<< front
- 
-=======
-  // void _startAnalysis() {
-  //   // Simulate a 4-second analysis process
-  //   Timer.periodic(const Duration(milliseconds: 100), (timer) {
-  //     setState(() {
-  //       if (_progress < 1.0) {
-  //         _progress += 0.025;
-  //         _taskIndex = (_progress * _tasks.length).floor().clamp(
-  //           0,
-  //           _tasks.length - 1,
-  //         );
-  //       } else {
-  //         timer.cancel();
-  //         _navigateToResults();
-  //       }
-  //     });
-  //   });
-  // }
 
-  // comment sekejap
-  // void _navigateToResults() {
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => const TriageResultView(category: "SEDERAHANA"),
-  //     ),
-  //   );
-  // }
->>>>>>> master
+  Future<void> _updateProgress(int taskIndex, double progress) async {
+    if (!mounted) return;
+    setState(() {
+      _taskIndex = taskIndex;
+      _progress = progress;
+    });
+    await Future.delayed(const Duration(milliseconds: 400));
+  }
+
+  void _retry() {
+    setState(() {
+      _isAnalyzing = true;
+      _errorMessage = null;
+      _progress = 0.0;
+      _taskIndex = 0;
+    });
+    _startAnalysis();
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,50 +113,103 @@ class _AnalysisViewState extends State<AnalysisView> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            // REMOVED 'const' from the list below
-            children: [
-              // Central Icon with Gradient
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(
-                  // Added const here
-                  Icons.analytics_outlined,
-                  size: 64,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                "Menganalisis...",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 48),
-
-              // Animated Task List (Dynamic - cannot be const)
-              ...List.generate(_tasks.length, (index) => _buildTaskItem(index)),
-
-              const SizedBox(height: 40),
-              LinearProgressIndicator(
-                value: _progress, // Dynamic value
-                backgroundColor: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
-                minHeight: 10,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "${(_progress * 100).toInt()}% selesai",
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
+          child: _errorMessage != null 
+              ? _buildErrorView() 
+              : _buildAnalyzingView(),
         ),
       ),
+    );
+  }
+
+  Widget _buildAnalyzingView() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: const Icon(
+            Icons.analytics_outlined,
+            size: 64,
+            color: Colors.blue,
+          ),
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          "Menganalisis dengan AI...",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Gemini 2.0 Flash",
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 48),
+
+        // Animated Task List
+        ...List.generate(_tasks.length, (index) => _buildTaskItem(index)),
+
+        const SizedBox(height: 40),
+        LinearProgressIndicator(
+          value: _progress,
+          backgroundColor: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+          minHeight: 10,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "${(_progress * 100).toInt()}% selesai",
+          style: const TextStyle(color: Colors.grey),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorView() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.red.shade50,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red.shade400,
+          ),
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          "Analisis Gagal",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          _errorMessage!,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 32),
+        ElevatedButton.icon(
+          onPressed: _retry,
+          icon: const Icon(Icons.refresh),
+          label: const Text("Cuba Lagi"),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Kembali"),
+        ),
+      ],
     );
   }
 
@@ -170,95 +242,4 @@ class _AnalysisViewState extends State<AnalysisView> {
     );
   }
 
-  void _debugPrintDraft() {
-    print("========== DRAFT DATA ==========");
-
-    print("PATIENT INFO: ");
-    print("Name: ${widget.draft.name}");
-    print("Age: ${widget.draft.age}");
-    print("Gender: ${widget.draft.gender}");
-    print("Last Clinic Visit: ${widget.draft.lastClinicVisit}");
-
-    print("\nCHRONIC DISEASE: ");
-    print("Selected: ${widget.draft.penyakitKronik}");
-    print("Other: ${widget.draft.penyakitKronikLain}");
-
-    print("\nSYMPTOMS: ");
-    if (widget.draft.symptoms.isEmpty) {
-      print("No symptoms selected");
-    } else {
-      widget.draft.symptoms.forEach((key, value) {
-        print("Symptom: $key");
-
-        print("   selected: ${value["selected"]}");
-        print("   type: ${value["type"]}");
-        print("   duration(extra): ${value["extra"]}");
-            });
-    }
-
-    print("\nVITALS: ");
-    if (widget.draft.vitals.isEmpty) {
-      print("No vitals recorded");
-    } else {
-      widget.draft.vitals.forEach((key, value) {
-        print(" - $key : $value");
-      });
-    }
-
-    print("\nIMAGES: ");
-    if (widget.draft.imageFiles.isEmpty) {
-      print("No images uploaded");
-    } else {
-      for (int i = 0; i < widget.draft.imageFiles.length; i++) {
-        print("Image $i path: ${widget.draft.imageFiles[i]?.path}");
-      }
-    }
-
-    print("=================================");
-  }
-
-  String _draftToString() {
-    final buffer = StringBuffer();
-
-    buffer.writeln("===== PATIENT INFO =====");
-    buffer.writeln("Name: ${widget.draft.name}");
-    buffer.writeln("Age: ${widget.draft.age}");
-    buffer.writeln("Gender: ${widget.draft.gender}");
-    buffer.writeln("Last Visit: ${widget.draft.lastClinicVisit}");
-
-    buffer.writeln("\n===== CHRONIC DISEASE =====");
-    buffer.writeln("Selected: ${widget.draft.penyakitKronik}");
-    buffer.writeln("Other: ${widget.draft.penyakitKronikLain}");
-
-    buffer.writeln("\n===== SYMPTOMS =====");
-    if (widget.draft.symptoms.isEmpty) {
-      buffer.writeln("No symptoms selected");
-    } else {
-      widget.draft.symptoms.forEach((key, value) {
-        buffer.writeln("$key:");
-        buffer.writeln("   type: ${value["type"]}");
-        buffer.writeln("   duration: ${value["extra"]}");
-      });
-    }
-
-    buffer.writeln("\n===== VITALS =====");
-    if (widget.draft.vitals.isEmpty) {
-      buffer.writeln("No vitals recorded");
-    } else {
-      widget.draft.vitals.forEach((key, value) {
-        buffer.writeln("$key → $value");
-      });
-    }
-
-    buffer.writeln("\n===== IMAGES =====");
-    if (widget.draft.imageFiles.isEmpty) {
-      buffer.writeln("No images uploaded");
-    } else {
-      for (int i = 0; i < widget.draft.imageFiles.length; i++) {
-        buffer.writeln("Image $i: ${widget.draft.imageFiles[i]?.path}");
-      }
-    }
-
-    return buffer.toString();
-  }
 }

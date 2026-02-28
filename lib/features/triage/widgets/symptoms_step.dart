@@ -1,6 +1,6 @@
 // Step 2: Simptom Pesakit
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kitahack_app/features/triage/triage_page.dart';
@@ -401,122 +401,185 @@ String additionalNotes = "";
   }
 
   Widget _buildCameraUploadBox() {
+    final hasImage = widget.draft.imageBase64 != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "Gambar (Pilihan)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         const SizedBox(height: 12),
-
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _pickFromCamera,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text("Imbas"),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _pickFromGallery,
-                      icon: const Icon(Icons.photo),
-                      label: const Text("Galeri"),
-                    ),
-                  ),
-                ],
+        GestureDetector(
+          onTap: _showImageSourceSheet,
+          child: Container(
+            height: 160,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: hasImage ? Colors.blue.shade300 : Colors.grey.shade300,
               ),
-
-              if (widget.draft.imageFiles.isNotEmpty) ...[
-                const SizedBox(height: 16),
-
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.draft.imageFiles.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemBuilder: (context, index) {
-                    final file =
-                        widget.draft.imageFiles[index];
-
-                    return Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(10),
-                          child: Image.file(
-                            file!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
+              borderRadius: BorderRadius.circular(12),
+              color: hasImage ? Colors.blue.shade50 : Colors.grey.shade50,
+            ),
+            child: hasImage
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.memory(
+                          base64Decode(widget.draft.imageBase64!),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
                         ),
-
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                widget.draft.imageFiles
-                                    .removeAt(index);
-                              });
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black54,
-                                shape: BoxShape.circle,
-                              ),
-                              padding:
-                                  const EdgeInsets.all(4),
-                              child: const Icon(
-                                Icons.close,
-                                size: 16,
-                                color: Colors.white,
-                              ),
+                      ),
+                      // Remove button
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: () => setState(() => widget.draft.imageBase64 = null),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
                             ),
                           ),
                         ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ],
+                      ),
+                      // Tap to change label
+                      Positioned(
+                        bottom: 8,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              "Ketik untuk tukar gambar",
+                              style: TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_photo_alternate_outlined,
+                          color: Colors.grey, size: 40),
+                      SizedBox(height: 8),
+                      Text(
+                        "Ambil atau muat naik gambar",
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Berguna untuk ruam, luka, atau keadaan kulit",
+                        style: TextStyle(color: Colors.grey, fontSize: 11),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ],
     );
   }
-  
-  Future<void> _pickFromCamera() async {
-    final XFile? photo =
-        await _picker.pickImage(source: ImageSource.camera);
 
-    if (photo != null) {
+  void _showImageSourceSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Only show camera on mobile — Windows doesn't support it
+            if (!Platform.isWindows)
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Colors.blue),
+                title: const Text("Ambil Gambar (Kamera)"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.blue),
+              title: const Text("Pilih dari Galeri"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            if (widget.draft.imageBase64 != null)
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text(
+                  "Buang Gambar",
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() => widget.draft.imageBase64 = null);
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final XFile? picked = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+
+      if (picked == null) return;
+
+      final bytes = await picked.readAsBytes();
       setState(() {
-        widget.draft.imageFiles.add(File(photo.path));
+        widget.draft.imageBase64 = base64Encode(bytes);
       });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tidak dapat memilih gambar: $e")),
+      );
     }
   }
 

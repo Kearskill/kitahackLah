@@ -86,8 +86,7 @@ class _VitalsStepState extends State<VitalsStep> {
                   "mmHg",
                   "Normal: 90/60 - 120/80",
                   onChanged: (value) {
-                    widget.draft.vitals["bp"] =
-                    double.tryParse(value);
+                    widget.draft.vitals["bp"] = value;  // store as string e.g. "120/80"
                   }
                 )
               ),
@@ -396,7 +395,7 @@ class _VitalsStepState extends State<VitalsStep> {
               LengthLimitingTextInputFormatter(3),
             ],
             onChanged: (value) {
-              widget.draft.vitals["suhu"] =
+              widget.draft.vitals["spo2"] =  // was "suhu" — was overwriting temperature
               double.tryParse(value);
             },
             decoration: InputDecoration(
