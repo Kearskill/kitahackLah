@@ -45,6 +45,7 @@ class SymptomsStep extends StatefulWidget {
 
 class _SymptomsStepState extends State<SymptomsStep> {
 
+final ImagePicker _picker = ImagePicker();
 late List<SymptomCategory> categories;
 
 String searchQuery = "";
@@ -582,6 +583,17 @@ String additionalNotes = "";
     }
   }
 
+  Future<void> _pickFromGallery() async {
+    final List<XFile>? images =
+        await _picker.pickMultiImage();
+
+    if (images != null && images.isNotEmpty) {
+      setState(() {
+        widget.draft.imageFiles
+            .addAll(images.map((e) => File(e.path)));
+      });
+    }
+  }
 
   // Widget _buildSymptomExtraField(Symptom symptom) {
   //   return Padding(

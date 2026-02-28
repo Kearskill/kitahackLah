@@ -105,7 +105,7 @@ class _AnalysisViewState extends State<AnalysisView> {
       _taskIndex = 0;
     });
     _startAnalysis();
-  }
+
 
   @override
   Widget build(BuildContext context) {
