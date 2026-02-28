@@ -1,53 +1,4 @@
-# kitahack_app
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-
-```
-lib/
-│
-├── main.dart
-│
-├── app/
-│   ├── app.dart
-│   ├── theme/
-│   │   ├── app_theme.dart
-│   │   └── color_schemes.dart
-│   └── routes.dart
-│
-├── core/
-│   ├── constants/
-│   ├── utils/
-│   └── services/
-│
-├── features/
-│   └── home/
-│       ├── home_page.dart
-│       ├── home_view.dart
-│       └── widgets/
-│
-├── shared/
-│   ├── widgets/
-│   └── extensions/
-│
-└── models/
-```
-
-
+# 🏥 DocTeleMY: AI Clinical Assistant for Rural Malaysia
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
@@ -58,39 +9,62 @@ lib/
 ![Google Workspace](https://img.shields.io/badge/Google%20Workspace-4285F4?style=for-the-badge&logo=googleworkspace&logoColor=white)
 ![Google Meet Integration](https://img.shields.io/badge/Google%20Meet-00897B?style=for-the-badge&logo=googlemeet&logoColor=white)
 
+**DocTeleMY** is an offline-first, AI-powered Clinical Decision Support System (CDSS) designed specifically for medical assistants staffing doctor-less rural clinics in regions like Sabah and Sarawak.
 
+By combining Google's Gemini AI with a resilient local database architecture, DocTeleMY provides specialist-level triage guidance 24/7—even when the internet goes down.
 
-flutter dependencies
+## 🎯 The Problem
+In rural Malaysia, nearly half of remote clinics operate without a resident doctor. Medical assistants face the daily burden of making life-or-death triage decisions with limited resources. Current AI tools fail here because they assume a constant 4G/5G connection, creating a digital divide where those who need AI the most cannot access it.
 
+**UN SDGs Addressed:**
+* **SDG 3.8:** Universal Health Coverage
+* **SDG 9.c:** Resilient ICT Infrastructure (Offline-first functionality)
+* **SDG 10.2:** Reduced Inequalities
+
+## ✨ Key Features
+* 📶 **Offline-First Architecture:** Powered by Floor (SQLite DAO), health workers can perform complete triage assessments and save records with zero internet connectivity. Data syncs to the cloud automatically when 2G/LTE is restored.
+* 🤖 **Gemini-Powered Triage:** Utilizes **Gemini 1.5 Flash/Pro** to synthesize vitals (SpO2, heart rate), medical history, and symptoms into objective differential diagnoses.
+* 🎙️ **Hands-Free Dictation:** Integrates **Google Speech-to-Text** allowing health workers to dictate symptoms rapidly in Bahasa Malaysia during high-stress emergencies.
+* 🚦 **Visual Severity Zones:** Color-coded action banners (Red/Yellow/Green) for immediate urgency comprehension.
+
+## 🛠️ Technology Stack
+* **Frontend:** Flutter (Feature-First Clean Architecture)
+* **Backend/Sync:** Firebase (Cloud Firestore, Authentication)
+* **Local Database:** Floor (SQLite DAO pattern)
+* **AI & Machine Learning:** Google AI Studio (Gemini API), Cloud Vision, Speech-to-Text
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to run DocTeleMY on your local machine.
+
+### Prerequisites
+* Flutter SDK (`>=3.0.0`)
+* Dart SDK
+* Firebase CLI installed and authenticated
+
+### Installation
+
+1. **Clone the repository**
+   
+```
+git clone https://github.com/Kearskill/kitahackLah.git
+cd kitahacklah
+```
+   
+
+2. **Install dependencies**
+   
 ```
 flutter pub get
-
-dart run flutter_native_splash:create
 ```
 
+3. **Run the App**
 
-
-summary of the project, including its purpose and problem statement.
-How it aligns with AI and SDGs.
-
-
- setup instructions
-
- Technical Implementation Overview of technologies used, including Google tools.
-Explanation of implementation, innovation, and challenges faced.
-
-
-npm install -g firebase-tools
-
-dart pub global activate flutterfire_cli
-
-dart run build_runner build
-
-dart pub global activate flutterfire_cli
-
-dart pub global run flutterfire configure
-
-& "C:\Users\User\AppData\Local\Pub\Cache\bin\flutterfire.bat" configure
+```
+flutter run
+```
 
 environmental variables
 
@@ -99,3 +73,18 @@ lib/firebase_options.dart
 firebase.json
 android\app\google-services.json
 ```
+
+📂 Project Structure
+This project utilizes a Feature-First architecture:
+
+`lib/core/`: Shared services, themes, and global database initialization.
+
+`lib/features/triage/`: Self-contained module for the entire triage flow.
+
+`/data/`: Contains the `TriageRecord` model, Floor DAO, and Repository.
+
+`/widgets/`: UI components like `PatientInfoStep`, `VitalsStep`, and the stepper indicator.
+
+
+👥 Team
+[Learn And Hustle] - Hackathon Submission
